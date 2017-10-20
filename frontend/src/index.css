@@ -1,0 +1,115 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+ul {
+  padding-left: 0;
+}
+
+li {
+  list-style-type: none;
+}
+
+.categories {
+ margin-left: 100px;
+  margin-top: 50px;
+}
+.category {
+  display: flex;
+  justify-content: space-around;
+  margin: 0;
+  margin-top: 50px;
+}
+
+.posts {
+ margin-top: 100px;
+}
+
+.add-post {
+  background: none;
+  font-size: 18px;
+  border: none;
+  text-decoration: underline;
+  cursor: pointer;
+  float: right;
+}
+
+.readable {
+  margin: 0 auto;
+  max-width: 1070px;
+  padding: 20px;
+  min-width: 1070px;
+} 
+
+.categoryposts {
+  margin-top: 50px;
+}
+
+.linktoCat {
+ float: right;
+  margin-right: 155px;
+}
+.pdetails td.noBorder { 
+  border: 0;
+}
+.pdetails th, .pdetails td {
+  border: 1px solid black;
+}
+
+.postForm {
+  margin-bottom: 20px;
+}
+
+.modal {
+  position: absolute;
+  top: 40px;
+  left: 200px;
+  right: 200px;
+  bottom: 40px;
+  border: 1px solid rgb(204, 204, 204);
+  background: rgb(255, 255, 255);
+  overflow: auto;
+  border-radius: 4px;
+  outline: none;
+  padding: 20px;
+  border-radius: 3px;
+  box-shadow: 0 3px 8px 0 rgba(0,0,0,.24), 0 3px 12px 0 rgba(0,0,0,.12);
+  min-width: 500px;
+}
+
+.ui.icon.button.voteup {
+  margin-left: 5px;
+  padding: 0.02em;
+}
+
+.ui.icon.button.votedown {
+  padding: 0.02em;
+}
+
+.menuItems {
+  width: 18%;
+  margin-bottom: 25px !important;
+}
+
+.inline {
+  margin-top: 15px;
+}
+
+.ui.basic.secondary.button, .ui.basic.secondary.buttons .button {
+  width: 85%;
+}
+
+.modal {
+  top: 100px;
+  bottom: 360px;
+}
+
+
+
