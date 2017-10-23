@@ -26,6 +26,7 @@ class AddPost extends Component {
    const title = this.postTitle;
    const author = this.postAuthor;
    const content = this.postContent;
+   const category = this.state.value;   
    if(title.value.length >0 && author.value.length >0 && content.value.length >0) {
        const obj = {
            title: title.value,
@@ -33,7 +34,7 @@ class AddPost extends Component {
            author: author.value,
            timestamp: Date.now(),
            id: "8xf0y6ziyjabvozdd"+ Math.random(100),
-           category: this.state.value,
+           category: category,
            deleted: false,
            voteScore: 1
 
