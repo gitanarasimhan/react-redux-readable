@@ -89,7 +89,7 @@ class PostDetailView extends Component {
         const postsUrl = `${getUrl()}/comments/${newObj.id}`;
         fetch(postsUrl, {
             method: "DELETE",
-            headers: {'Content-Type': 'application/json'},
+            headers:{'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'},
             credentials: getCredentials()
         })
             .then((res) => {
