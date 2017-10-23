@@ -198,7 +198,7 @@ render() {
 
     </Container>
 )}/>
-<Route path='/category/:id' render={() => (
+<Route exact path='/category/:id' render={() => (
     <CategoryView postsCategory={this.props.posts.posts} postDetails = {this.ongetPostDetails} category={this.state.category} categoryCount={this.state.count} comments={this.props.comments} updateVote={this.onUpdateVoteScore} editPost={this.props.onEditPost} postDeleted={this.props.onPostDeleted}/>
 )}/>
 <Route path='/category/posts/:id' render={() => (

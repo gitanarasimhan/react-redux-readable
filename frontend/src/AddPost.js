@@ -5,6 +5,9 @@ import {getUrl, getCredentials} from './config';
 import {Container} from 'semantic-ui-react';
 
 class AddPost extends Component {
+    state = {
+        category: 'react'
+    }
   componentWillMount() {
     if(this.props.postid !== null) {
       this.fillVal = this.props.postid;
@@ -16,11 +19,13 @@ class AddPost extends Component {
   componentDidMount() {
 
   }
+    handleChange = (event) => {
+        this.setState({value: event.target.value});
+    }
   onAddPostClicked = () => {
    const title = this.postTitle;
    const author = this.postAuthor;
    const content = this.postContent;
-   const category = this.postCategory;
    if(title.value.length >0 && author.value.length >0 && content.value.length >0) {
        const obj = {
            title: title.value,
@@ -28,7 +33,7 @@ class AddPost extends Component {
            author: author.value,
            timestamp: Date.now(),
            id: "8xf0y6ziyjabvozdd"+ Math.random(100),
-           category: category.value,
+           category: this.state.value,
            deleted: false,
            voteScore: 1
 
@@ -103,7 +108,7 @@ class AddPost extends Component {
                         <div className="fields">
                             <div className="field">
                                 <label>Category</label>
-                                <select disabled={this.disabled}>{this.props.categories.map((obj)=> <option value={(this.fillVal && this.fillVal!==null && this.fillVal.category) || obj.name} ref={(input)=>{this.postCategory = input}}>{obj.name}</option>)}</select>
+                                <select disabled={this.disabled} onChange={this.handleChange}>{this.props.categories.map((obj)=> <option value={(this.fillVal && this.fillVal!==null && this.fillVal.category) || obj.name}>{obj.name}</option>)}</select>
                             </div>
                         </div>
                         <div className="fields">
