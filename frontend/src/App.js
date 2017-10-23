@@ -28,7 +28,6 @@ class App extends Component {
 
     componentDidMount() {
         const categoryUrl  = `${getUrl()}/categories`;
-        console.log('fetching from url', categoryUrl);
         fetch(categoryUrl, {
             headers:  {'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'},
             credentials: getCredentials()
@@ -41,7 +40,6 @@ class App extends Component {
     });
 
         const postsUrl = `${getUrl()}/posts`;
-        console.log('fetching from url', postsUrl);
         fetch(postsUrl, {
             method: "GET",
             headers: {'Authorization': 'whatever-you-want'},
@@ -69,7 +67,6 @@ class App extends Component {
 
 ongetComment = (id) => {
     const postComments = `${getUrl()}/posts/${id}/comments`;
-    console.log('fetching from url', postComments);
     fetch(postComments, {
         headers: {'Authorization': 'whatever-you-want'},
         credentials: getCredentials()
@@ -89,7 +86,6 @@ ongetPostDetails = (data) => {
 
     onUpdateVoteScore = (obj, value) => {
         const url  = `${getUrl()}/posts/${obj.id}`;
-        console.log('fetching from url', url);
         fetch(url, {
             method: "POST",
             body: JSON.stringify({ option: value }),
@@ -160,7 +156,7 @@ render() {
         <Grid columns={2}>
            <Grid.Column >
         {this.props.categories.categories.length > 0 && this.props.categories.categories.map(obj =>
-        <Link  key={obj.path} to='/postByCategory' float='right'><Segment onClick={(event) => this.getPostByCategory(event.currentTarget)}>{obj.name && capitalize(obj.name)}</Segment></Link>
+        <Link key={obj.path} to={`/category/${obj.path}`} float='right'><Segment onClick={(event) => this.getPostByCategory(event.currentTarget)}>{obj.name && capitalize(obj.name)}</Segment></Link>
 )}
             </Grid.Column>
            <Grid.Column>
@@ -180,7 +176,7 @@ render() {
                    <th>VoteScore<Button className="ui icon button voteup" onClick={() => {this.getSortFn('voteScore')}}><i class="voteScore angle up icon"></i></Button></th>
                </tr>
     {this.props.posts.posts.length >0 && this.props.posts.posts.sort(this.state.sortFn).map(obj => obj.deleted === false && <tr key={obj.id}>
-        <td><Link key={obj.id} to='/postDetail' onClick= {()=> {this.ongetPostDetails(obj.id)}}><Segment>{obj.title && `${obj.title} by ${capitalize(obj.author)} --- ${capitalize(obj.body)}`}</Segment></Link></td>
+        <td><Link key={obj.id} to={`/category/posts/${obj.id}`} onClick= {()=> {this.ongetPostDetails(obj.id)}}><Segment>{obj.title && `${obj.title} by ${capitalize(obj.author)} --- ${capitalize(obj.body)}`}</Segment></Link></td>
                   <td><Segment>{this.props.comments.comments.length >0 && getCommentCount(obj, this.props.comments.comments)}</Segment></td>
                   <td><Segment>{obj.timestamp}</Segment></td>
                   <td><Segment>{obj.voteScore}
@@ -202,10 +198,10 @@ render() {
 
     </Container>
 )}/>
-<Route path='/postByCategory' render={() => (
+<Route path='/category/:id' render={() => (
     <CategoryView postsCategory={this.props.posts.posts} postDetails = {this.ongetPostDetails} category={this.state.category} categoryCount={this.state.count} comments={this.props.comments} updateVote={this.onUpdateVoteScore} editPost={this.props.onEditPost} postDeleted={this.props.onPostDeleted}/>
 )}/>
-<Route path='/postDetail' render={() => (
+<Route path='/category/posts/:id' render={() => (
     <PostDetailView details={this.props.posts.posts} updateCommentScore={this.props.updateCommentScore} id={this.state.postsDetails} comments={this.props.comments} onEdit={this.props.onEditPost} onCommentAdded = {this.props.onNewCommentAdded} updateVote={this.onUpdateVoteScore} onCommentEdited = {this.props.editComment} onCommentDeleted = {this.props.deleteComment} onPostDeleted = {this.props.onPostDeleted}/>
 )}/>
 <Route path='/addPost' render={() => (

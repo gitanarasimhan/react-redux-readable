@@ -16,7 +16,6 @@ class PostDetailView extends Component {
 
     onPostDeleted = (id) => {
         const url = `${getUrl()}/posts/${id}`
-        console.log('fetching from url', url);
         fetch(url, {
             headers: {'Authorization': 'whatever-you-want'},
             credentials: getCredentials(),
@@ -26,7 +25,6 @@ class PostDetailView extends Component {
                 return (res.text())
             })
             .then((data) => {
-           		console.log("Post deleted successfully");
             });
     }
     openCommentModal = (type, comment) => {
@@ -137,7 +135,6 @@ class PostDetailView extends Component {
 
      onUpdateCommentScore = (obj, value) => {
          const url  = `${getUrl()}/comments/${obj.id}`;
-         console.log('fetching from url', url);
          fetch(url, {
              method: "POST",
              body: JSON.stringify({ option: value }),

@@ -138,7 +138,6 @@ function deletePostsInServer(data) {
         return (res.text())
 })
 .then((data) => {
-        console.log("Post successfully deleted");
 });
 }
 

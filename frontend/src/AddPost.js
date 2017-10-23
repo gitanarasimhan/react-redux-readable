@@ -21,7 +21,7 @@ class AddPost extends Component {
    const author = this.postAuthor;
    const content = this.postContent;
    const category = this.postCategory;
-   if(title.value.length >0 && author.value.lenght >0 && content.value.length >0) {
+   if(title.value.length >0 && author.value.length >0 && content.value.length >0) {
        const obj = {
            title: title.value,
            body: content.value,
@@ -45,8 +45,6 @@ class AddPost extends Component {
            })
            .then((output) => {
                this.props.onSubmit(JSON.parse(output));
-               console.log("successfully added");
-               this.props.history.push("/")
            });
    }
   }
@@ -76,7 +74,6 @@ class AddPost extends Component {
                })
                .then((data) => {
                    this.props.onPostEdited(JSON.parse(data));
-                   console.log("Post successfully edited");
                });
        }
    }
@@ -110,7 +107,7 @@ class AddPost extends Component {
                             </div>
                         </div>
                         <div className="fields">
-                            {this.fillVal === undefined &&  <button className="ui button"  onClick={this.onAddPostClicked}>Add Post</button>}
+                            {this.fillVal === undefined &&  <Link to= '/'><button className="ui button"  onClick={this.onAddPostClicked}>Add Post</button></Link>}
                             {this.fillVal && <Link to= '/' onClick={this.onPostEdited}><button className="ui button">Edit Post</button></Link>}
                         </div>
                     </div>

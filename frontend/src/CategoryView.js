@@ -27,7 +27,7 @@ class CategoryView extends Component {
                                     return b.voteScore - a.voteScore
                                 }).map(obj =>
                                 obj.deleted === false && obj.category === this.props.category && <tr key={obj.id}>
-                                    <td><Link key={obj.id} to='/postDetail' onClick= {()=> {this.props.postDetails(obj.id)}}><Segment>{`${obj.title} by ${capitalize(obj.author)} --- ${capitalize(obj.body)}  `}
+                                    <td><Link key={obj.id} to={`/category/posts/${obj.id}`} onClick= {()=> {this.props.postDetails(obj.id)}}><Segment>{`${obj.title} by ${capitalize(obj.author)} --- ${capitalize(obj.body)}  `}
                                     </Segment></Link></td>
                                     <td><Segment>{this.props.comments.comments.length >0 && getCommentCount(obj, this.props.comments.comments)}</Segment></td>
                                     <td><Segment>{obj.voteScore}
