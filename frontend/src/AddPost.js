@@ -6,7 +6,7 @@ import {Container} from 'semantic-ui-react';
 
 class AddPost extends Component {
     state = {
-        category: 'react'
+        value: 'react'
     }
   componentWillMount() {
     if(this.props.postid !== null) {
