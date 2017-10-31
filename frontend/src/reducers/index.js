@@ -1,145 +1,112 @@
 import { combineReducers } from 'redux'
-
-import {
-    ADD_POST, GET_POST, GET_POST_ID,ADD_COMMENTS, GET_COMMENTS, EDIT_COMMENT, DELETE_COMMENT, EDIT_POST, DELETE_POST, GET_ALL_POSTS
-} from '../actions'
-
-import {getUrl, getCredentials} from '../config'
+import * as cons from '../actions/constants'
 
 
 function posts (state = {posts: []}, action) {
-    const { id, category, deleted, timestamp ,title, body, author, voteScore } = action
-
     switch (action.type) {
-        case ADD_POST :
-            const newPost = {
-                title: title,
-                body: body,
-                timestamp: timestamp,
-                voteScore: voteScore,
-                author: author,
-                id: id,
-                category: category,
-                deleted: deleted
-            }
-            return {posts: [...state.posts, newPost]};
- case GET_ALL_POSTS: {
-        const post = {
-            title: title,
-            body: body,
-            timestamp: timestamp,
-            voteScore: voteScore,
-            author: author,
-            id: id,
-            category: category,
-            deleted: deleted
+        case cons.ADD_POST :
+            return {posts: [...state.posts, action.value]};
+        case cons.GET_ALL_POSTS: {
+            return {posts: [...state.posts, action.value]};
         }
-        return {posts: [...state.posts, post]};
-        }
-case EDIT_POST: {
-        return {posts:
-            state.posts.map(post => post.id ===action.id ?{ ...post, title: action.title, body: action.body, voteScore: action.voteScore}: post)
-    };
+        case cons.EDIT_POST: {
+            return {posts:
+                state.posts.map(post => post.id ===action.value.id ?{ ...post, title: action.value.title, body: action.value.body, voteScore: action.value.voteScore}: post)
+            };
 
-    }
-case DELETE_POST: {
-        const deletedPost = {
-            title: title,
-            body: body,
-            timestamp: timestamp,
-            voteScore: voteScore,
-            author: author,
-            id: id,
-            category: category,
-            deleted: true
         }
-        deletePostsInServer(deletedPost);
-        return {posts:
-            state.posts.map(post => post.id ===action.id ?{ ...post, deleted: deletedPost.deleted}: post)
-    };
+        case cons.DELETE_POST: {
+            action.value.deleted = true;
+            return {
+                posts: state.posts.map(post => post.id === action.value.id ? {
+                    ...post,
+                    deleted: action.value.deleted
+                } : post)
+            };
+        }
+        default :
+            return state;
     }
-default : return state;
 }
+
+function currentCategory (state = {category: ""}, action) {
+    switch (action.type) {
+        case cons.CURRENT_CAT: {
+            return Object.assign(state,  {category: action.value});
+
+        }
+        default: return state;
+    }
+}
+
+function currentCategoryPostCount (state = {count: ""}, action) {
+    switch (action.type) {
+        case cons.CURR_CATE_POST_COUNT: {
+            return Object.assign(state,  {count: action.value});
+        }
+        default: return state;
+    }
+}
+
+function getCurrentPost (state = {id: ""}, action) {
+    switch (action.type) {
+        case cons.CURR_POST: {
+            return Object.assign(state,  {id: action.value});
+        }
+        default: return state;
+    }
 }
 
 
 function categories(state = {categories: []}, action) {
-    const { name, path } = action;
+    const {name, path} = action;
 
+    const newPost = {name, path}
     switch (action.type) {
-        case GET_POST:
-            const newPost = {
-                name: name,
-                path: path
-            }
+        case cons.GET_POST:
             return {categories: [...state.categories, newPost]};
-default:
-    return state
-}
-}
-
-function comments (state = {comments: []}, action) {
-    const { id, parentId , body, author, timestamp, deleted, parentDeleted, voteScore} = action;
-
-    switch (action.type) {
-        case ADD_COMMENTS:
-            const newComment = {
-                body: body,
-                timestamp: timestamp,
-                author: author,
-                id: id,
-                parentId: parentId
-            }
-            return {comments: [...state.comments, newComment]};
-case GET_COMMENTS:
-        const Comment = {
-            body: body,
-            timestamp: timestamp,
-            author: author,
-            id: id,
-            parentId: parentId,
-            deleted: deleted,
-            parentDeleted:parentDeleted,
-            voteScore: voteScore
-        }
-    return {comments: [...state.comments, Comment]};
-case EDIT_COMMENT: {
-        return {comments:
-            state.comments.map(comment => comment.id ===action.id ?{ ...comment, body: action.body , author: action.author, voteScore: action.voteScore}: comment)
-    };
-    }
-case DELETE_COMMENT: {
-        return {comments:
-            state.comments.map(comment => comment.id ===action.id ?{ ...comment, deleted: action.deleted}: comment)
-    };
-    }
-default: return state
-}
-}
-function postid(state = {postid: []}, action) {
-    const {object} = action;
-
-    switch (action.type) {
-        case GET_POST_ID:
-            return object;
         default:
             return state
     }
 }
 
-function deletePostsInServer(data) {
-    const postsUrl = `${getUrl()}/posts/${data.id}`;
-    fetch(postsUrl, {
-        method: "DELETE",
-        headers: {'Authorization': 'whatever-you-want'},
-        credentials: getCredentials()
-    })
-        .then((res) => {
-        return (res.text())
-})
-.then((data) => {
-});
+
+
+function comments (state = {comments: []}, action) {
+    switch (action.type) {
+        case cons.ADD_COMMENTS:
+            return {comments: [...state.comments, action.value]};
+        case cons.GET_COMMENTS:
+            return {comments: [...state.comments, action.value]};
+        case cons.EDIT_COMMENT: {
+            return {
+                comments: state.comments.map(comment => comment.id === action.value.id ? {
+                    ...comment,
+                    body: action.value.body,
+                    author: action.value.author,
+                    voteScore: action.value.voteScore
+                } : comment)
+            };
+        }
+        case cons.DELETE_COMMENT: {
+            return {
+                comments: state.comments.map(comment => comment.id === action.value.id ? {
+                    ...comment,
+                    deleted: action.value.deleted
+                } : comment)
+            };
+        }
+        default:
+            return state
+    }
 }
 
-
-export default combineReducers({categories, posts, postid, comments});
+function postid(state = {postid: ""}, action) {
+    switch (action.type) {
+        case cons.GET_POST_ID:
+            return action.value;
+        default:
+            return state
+    }
+}
+export default combineReducers({categories, posts, postid, comments, currentCategory, currentCategoryPostCount, getCurrentPost});
