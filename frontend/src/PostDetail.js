@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
 import './App.css';
-import {Link} from 'react-router-dom';
+import {Link, withRouter} from 'react-router-dom';
 import Modal from 'react-modal';
-import {getUrl, getCredentials} from './config'
+import {connect} from 'react-redux';
 import { Container, Grid, Header } from 'semantic-ui-react'
+import {getCurrPost, onUpdateScore} from './actions'
 
 
 
@@ -14,28 +15,28 @@ class PostDetailView extends Component {
     comment: null,
   }
 
-    onPostDeleted = (id) => {
-        const url = `${getUrl()}/posts/${id}`
-        fetch(url, {
-            headers: {'Authorization': 'whatever-you-want'},
-            credentials: getCredentials(),
-            method: "DELETE"
-        })
-            .then((res) => {
-                return (res.text())
-            })
-            .then((data) => {
-            });
-    }
+  componentWillReceiveProps(){
+      var str = "/category/posts/";
+      var length = str.length;
+      var subStr = this.props.location.pathname.substr(length,this.props.location.pathname.length);
+      this.props.ongetCurrentPost(subStr);
+  }
+
+  componentWillMount() {
+      var str = "/category/posts/";
+      var length = str.length;
+      var subStr = this.props.location.pathname.substr(length,this.props.location.pathname.length);
+      this.props.ongetCurrentPost(subStr);
+  }
     openCommentModal = (type, comment) => {
      this.setState({commentsModalOpen: true})
-     if(type === true) {
+     if(type) {
        this.setState({editComment: true});
      } else {
         this.setState({editComment: false});
      }
      if(comment !== null) {
-       this.setState({comment: comment})
+       this.setState({comment})
      } 
     }
 	onCommentEdited = () => {
@@ -52,26 +53,10 @@ class PostDetailView extends Component {
               voteScore: obj.voteScore,
               parentDeleted: obj.parentDeleted
           }
-
-          const postsUrl = `${getUrl()}/comments/${newObj.id}`;
-          fetch(postsUrl, {
-              method: "PUT",
-              body:  JSON.stringify(newObj),
-              headers: {'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'},
-              credentials: getCredentials()
-          })
-              .then((res) => {
-                  return (res.text())
-              })
-              .then((data) => {
-                  this.props.onCommentEdited(JSON.parse(data));
-              });
+          this.props.onCommentEdited(newObj);
       }
       else {
-          alert("Please enter correct values");
-      }
-
-
+          document.getElementsByClassName("errorMsg")[0].innerHTML = "Please enter the correct values";      }
     }
 
 	onCommentDeleted = (comment) => {
@@ -85,21 +70,7 @@ class PostDetailView extends Component {
        voteScore: comment.voteScore,
        parentDeleted: comment.parentDeleted  
       }
-
-        const postsUrl = `${getUrl()}/comments/${newObj.id}`;
-        fetch(postsUrl, {
-            method: "DELETE",
-            headers:{'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'},
-            credentials: getCredentials()
-        })
-            .then((res) => {
-                return (res.text())
-            })
-            .then((data) => {
-                this.props.onCommentDeleted(JSON.parse(data));
-                return JSON.parse(data);
-            });
-      this.props.onCommentDeleted(newObj);
+        this.props.onCommentDeleted(newObj);
     }
     
 	addComment = () => {
@@ -107,113 +78,102 @@ class PostDetailView extends Component {
           this.setState({commentsModalOpen: false});
           const commentObj = {
               id: "894tuq4ut84ut8v4t8wun" + Math.random(100),
-              parentId: this.props.id,
+              parentId: this.props.getCurrentPost.id,
               timestamp: Date.now(),
               body: this.commentBody.value,
               author: this.commentAuthor.value
           }
-
-          const postsUrl = `${getUrl()}/comments`;
-          fetch(postsUrl, {
-              method: "POST",
-              body:  JSON.stringify(commentObj),
-              headers: {'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'},
-              credentials: getCredentials()
-          })
-              .then((res) => {
-                  return (res.text())
-              })
-              .then((data) => {
-                  this.props.onCommentAdded(JSON.parse(data));
-              });
+          this.props.onCommentAdded(commentObj);
       }
       else {
-          alert("Please enter correct values");
+          document.getElementsByClassName("errorMsg")[0].innerHTML = "Please enter the correct values";
       }
-
      }
 
-     onUpdateCommentScore = (obj, value) => {
-         const url  = `${getUrl()}/comments/${obj.id}`;
-         fetch(url, {
-             method: "POST",
-             body: JSON.stringify({ option: value }),
-             headers:  {'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'},
-             credentials: getCredentials()
-         })
-             .then((res) => {
-                 return (res.text())
-             })
-             .then((data) => {
-                 this.props.onCommentEdited(JSON.parse(data));
-             });
+     getPostsCount = () => {
+         let count  = 0;
+         {this.props.posts.posts.map(obj =>
+             this.props.getCurrentPost.id === obj.id && !obj.deleted && count++)};
+         return count;
      }
 
     render() {
         return (
         <div><Container style={{ padding: '5em 0em' }}>
-            <Header as='h2'>Post Details</Header>
+            {this.getPostsCount() > 0 && <Header as='h2'>Post Details</Header>}
             <Grid columns={1}>
                 <Grid.Column>
-                    <table style={{marginTop: 25 + 'px'}} className="ui celled table">
-                        <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>Content</th>
-                            <th>Timestamp</th>
-                            <th>Votescore</th>
-                            <th colSpan={this.props.comments.comments.length}></th>
-                            <th></th>
-                        </tr>
-                        </thead>
+                    {this.getPostsCount() === 0 && <div>Post may have been deleted </div>}
+                    {this.getPostsCount() > 0 && <table style={{marginTop: 25 + 'px'}} className="ui celled table">
                         <tbody>
-                        {this.props.details.map(obj =>
-                            this.props.id === obj.id && <tr>
-                                <td>{obj.title}</td>
-                                <td>{obj.author}</td>
-                                <td>{obj.body}</td>
-                                <td>{obj.timestamp}</td>
-                                <td>{obj.voteScore}
-                                    <button className="ui icon button voteup" onClick={() => this.props.updateVote(obj, "upVote")}>
-                                        <i className="caret up icon"></i>
-                                    </button>
-                                    <button className="ui icon button votedown" onClick={() => this.props.updateVote(obj, "downVote")}>
-                                        <i className="caret down icon"></i>
-                                    </button>
-                                </td>
-                                {this.props.comments.comments && this.props.comments.comments.map((comment) =>
-                                    comment.parentId === obj.id &&
-                                    <td>{`${comment.body} by ${comment.author}`}
-                                        <div className="inline">
-                                            {`Score: ${comment.voteScore}`}
-                                            <button className="ui icon button voteup" onClick={() => this.onUpdateCommentScore(comment, "upVote")}>
+                        {this.props.posts.posts.map(obj =>
+                            this.props.getCurrentPost.id === obj.id && !obj.deleted && <tr key={obj.id}>
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Author</th>
+                                        <th>Content</th>
+                                        <th>Timestamp</th>
+                                        <th>Votescore</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td className="borderBottom">{obj.title}</td>
+                                        <td className="borderBottom">{obj.author}</td>
+                                        <td className="borderBottom">{obj.body}</td>
+                                        <td className="borderBottom">{obj.timestamp}</td>
+                                        <td className="borderBottom">{obj.voteScore}
+                                            <button className="ui icon button voteup" onClick={() => this.props.updateVote(obj, "upVote")}>
                                                 <i className="caret up icon"></i>
                                             </button>
-                                            <button className="ui icon button votedown" onClick={() => this.onUpdateCommentScore(comment, "downVote")}>
+                                            <button className="ui icon button votedown" onClick={() => this.props.updateVote(obj, "downVote")}>
                                                 <i className="caret down icon"></i>
                                             </button>
-                                        </div>
-                                        <div className="inline">
-                                            <button className="ui secondary basic button mini" onClick={() => this.openCommentModal(true, comment)}>Edit</button>
-                                        </div>
+                                        </td>
+                                        <td className="borderBottom">
                                             <div className="inline">
-                                                <Link to="/"><button className="ui secondary basic button mini" onClick={() => this.onCommentDeleted(comment)}>Delete</button></Link>
+                                                <button className="ui secondary basic button mini" onClick={() => this.openCommentModal(false, null)}>Add Comment</button>
                                             </div>
-                                    </td>)}
-                                <td className="noBorder">
-                                    <div className="inline">
-                                        <button className="ui secondary basic button mini" onClick={() => this.openCommentModal(false, null)}>Add Comment</button>
-                                    </div>
-                                    <div className="inline">
-                                        <Link to='/AddPost' onClick={() => this.props.onEdit(obj)}><button className="ui secondary basic button mini">Edit</button></Link>
-                                    </div>
-                                    <div className="inline">
-                                        <Link to='/'><button className="ui secondary basic button mini"  onClick={() => this.props.onPostDeleted(obj)}>Delete</button></Link>
-                                    </div></td>
+                                            <div className="inline">
+                                                <Link to='/posts/addPost' onClick={() => this.props.onEdit({postid: obj})}><button className="ui secondary basic button mini">Edit</button></Link>
+                                            </div>
+                                            <div className="inline">
+                                                <Link to='/'><button className="ui secondary basic button mini"  onClick={() => this.props.onPostDeleted(obj)}>Delete</button></Link>
+                                            </div></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <table>
+                                    <tbody>
+                                    <tr>
+                                        {this.props.comments.comments && this.props.comments.comments.map((comment) =>
+                                        comment.parentId === obj.id && !comment.deleted &&
+                                        <td key={comment.id}>{`${comment.body} by ${comment.author}`}
+                                            <div className="inline">
+                                                {`Score: ${comment.voteScore}`}
+                                                <button className="ui icon button voteup" onClick={() => this.props.updateScore(comment, "upVote")}>
+                                                    <i className="caret up icon"></i>
+                                                </button>
+                                                <button className="ui icon button votedown" onClick={() => this.props.updateScore(comment, "downVote")}>
+                                                    <i className="caret down icon"></i>
+                                                </button>
+                                            </div>
+                                            <div className="inline">
+                                                <button className="ui secondary basic button mini" onClick={() => this.openCommentModal(true, comment)}>Edit</button>
+                                            </div>
+                                            <div className="inline">
+                                                <button className="ui secondary basic button mini" onClick={() => this.onCommentDeleted(comment)}>Delete</button>
+                                            </div>
+                                        </td>)}
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </tr>)}
                         </tbody>
-                    </table>
+                    </table>}
                 </Grid.Column>
             </Grid>
         </Container>
@@ -252,10 +212,24 @@ class PostDetailView extends Component {
                             </button>
                         </div>
                     </div>
+                    <div className="errorMsg"></div>
                 </div>
             </Modal>
           </div>
         );
     }
 }
-export default PostDetailView;
+
+function mapStateToProps ({ categories, posts, postid, comments,getCurrentPost }) {
+    return {categories, posts, postid, comments, getCurrentPost};
+}
+
+function mapDispatchToProps (dispatch) {
+    return {
+        ongetCurrentPost: (data) => dispatch(getCurrPost(data)),
+        updateScore: (data, value) => dispatch(onUpdateScore(data, value)),
+
+    }
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(PostDetailView));
