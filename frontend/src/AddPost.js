@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import './App.css';
-import {Link} from 'react-router-dom';
-import {getUrl, getCredentials} from './config';
+import {withRouter} from 'react-router-dom';
 import {Container} from 'semantic-ui-react';
 
 class AddPost extends Component {
@@ -9,16 +8,15 @@ class AddPost extends Component {
         value: 'react'
     }
   componentWillMount() {
-    if(this.props.postid !== null) {
-      this.fillVal = this.props.postid;
+    if(this.props.postid !== null && this.props.postid.postid) {
+      this.fillVal = this.props.postid.postid;
       this.disabled = true;
     } else {
       this.disabled = false;
     }
   }
-  componentDidMount() {
 
-  }
+
     handleChange = (event) => {
         this.setState({value: event.target.value});
     }
@@ -26,7 +24,7 @@ class AddPost extends Component {
    const title = this.postTitle;
    const author = this.postAuthor;
    const content = this.postContent;
-   const category = this.state.value;   
+   const category = this.state.value;
    if(title.value.length >0 && author.value.length >0 && content.value.length >0) {
        const obj = {
            title: title.value,
@@ -39,25 +37,13 @@ class AddPost extends Component {
            voteScore: 1
 
        }
-       const postsUrl = `${getUrl()}/posts`;
-       fetch(postsUrl, {
-           method: "POST",
-           body:  JSON.stringify(obj),
-           headers: {'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'},
-           credentials: getCredentials()
-       })
-           .then((res) => {
-               return (res.text())
-           })
-           .then((output) => {
-               this.props.onSubmit(JSON.parse(output));
-           });
+       this.props.history.push("/");
+       this.props.onSubmit(obj);
    }
   }
  onPostEdited = () => {
-   const value = this.props.postid;
-   if(this.postTitle.value.length >0 && this.postContent.value.length>0 ) {
-       if(value !== null) {
+    const value = this.props.postid.postid;
+   if(this.postTitle.value.length >0 && this.postContent.value.length>0 && this.props.postid !== null) {
            const obj = {
                title: this.postTitle.value,
                body: this.postContent.value,
@@ -68,20 +54,8 @@ class AddPost extends Component {
                deleted: value.deleted,
                voteScore: value.voteScore
            }
-           const postsUrl = `${getUrl()}/posts/${obj.id}`;
-           fetch(postsUrl, {
-               method: "PUT",
-               body:  JSON.stringify(obj),
-               headers: {'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'},
-               credentials: getCredentials()
-           })
-               .then((res) => {
-                   return (res.text())
-               })
-               .then((data) => {
-                   this.props.onPostEdited(JSON.parse(data));
-               });
-       }
+       this.props.history.push("/");
+       this.props.onPostEdited(obj);
    }
  }
  render() {
@@ -93,28 +67,28 @@ class AddPost extends Component {
                         <div className="fields">
                             <div className="field">
                                 <label>Title</label>
-                                <input name="title" required minlength="4" type="text" placeholder="Post title" ref={(input) => { this.postTitle = input; }} defaultValue={this.fillVal && this.fillVal!==null && this.fillVal.title}/>
+                                <input name="title" required minLength="4" type="text" placeholder="Post title" ref={(input) => { this.postTitle = input; }} defaultValue={this.fillVal && this.fillVal!==null && this.fillVal.title}/>
                             </div>
                             <div className="field">
                                 <label>Author</label>
-                                <input name="author" required minlength="2" maxLength="45" type="text" placeholder="Post author" disabled={this.disabled} ref={(input) => { this.postAuthor = input; }} defaultValue={this.fillVal && this.fillVal!==null
+                                <input name="author" required minLength="2" maxLength="45" type="text" placeholder="Post author" disabled={this.disabled} ref={(input) => { this.postAuthor = input; }} defaultValue={this.fillVal && this.fillVal!==null
                                 && this.fillVal.author}/>
                             </div>
                         </div>
                         <div className="field">
                             <label>Content</label>
-                            <input name="content" required minlength="6" maxLength="250" type="text" placeholder="Post Content"  ref={(input) => { this.postContent = input; }} defaultValue={this.fillVal && this.fillVal!==null
+                            <input name="content" required minLength="6" maxLength="250" type="text" placeholder="Post Content"  ref={(input) => { this.postContent = input; }} defaultValue={this.fillVal && this.fillVal!==null
                             && this.fillVal.body}/>
                         </div>
                         <div className="fields">
                             <div className="field">
                                 <label>Category</label>
-                                <select disabled={this.disabled} onChange={this.handleChange}>{this.props.categories.map((obj)=> <option value={(this.fillVal && this.fillVal!==null && this.fillVal.category) || obj.name}>{obj.name}</option>)}</select>
+                                <select disabled={this.disabled} onChange={this.handleChange}>{this.props.categories.map((obj)=> <option key={obj.path} value={(this.fillVal && this.fillVal!==null && this.fillVal.category) || obj.name}>{obj.name}</option>)}</select>
                             </div>
                         </div>
                         <div className="fields">
-                            {this.fillVal === undefined &&  <Link to= '/'><button className="ui button"  onClick={this.onAddPostClicked}>Add Post</button></Link>}
-                            {this.fillVal && <Link to= '/' onClick={this.onPostEdited}><button className="ui button">Edit Post</button></Link>}
+                            {this.fillVal === undefined &&  <button className="ui button"  onClick={this.onAddPostClicked}>Add Post</button>}
+                            {this.fillVal && <button className="ui button" onClick={this.onPostEdited}>Edit Post</button>}
                         </div>
                     </div>
                 </Container>
@@ -125,4 +99,4 @@ class AddPost extends Component {
  }
 }
 
-export default AddPost;
+export default withRouter(AddPost);
