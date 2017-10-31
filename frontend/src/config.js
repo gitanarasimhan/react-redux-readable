@@ -19,3 +19,37 @@ export const getCommentCount = (post, commentArr) => {
     })
     return count;
 }
+
+export const getSortFn = (value) => {
+    if(document.getElementsByClassName("voteScore")[0]) {
+        if(value === 'voteScore' && (document.getElementsByClassName("voteScore")[0].className).indexOf("up") >-1) {
+            document.getElementsByClassName("voteScore")[0].className += " down";
+            document.getElementsByClassName("voteScore")[0].classList.remove("up");
+            return function(a,b) {
+                return a.voteScore - b.voteScore
+            };
+        } else if(value === 'voteScore' && (document.getElementsByClassName("voteScore")[0].className).indexOf("down") >-1) {
+            document.getElementsByClassName("voteScore")[0].className += " up";
+            document.getElementsByClassName("voteScore")[0].classList.remove("down");
+            return function(a,b) {
+                return b.voteScore - a.voteScore
+            };
+        }
+
+        if(document.getElementsByClassName("stampUp")[0]) {
+            if(value === 'stampUp' && (document.getElementsByClassName("stampUp")[0].className).indexOf("up") >-1) {
+                document.getElementsByClassName("stampUp")[0].className += " down";
+                document.getElementsByClassName("stampUp")[0].classList.remove("up");
+                return function(a,b) {
+                    return a.voteScore - b.voteScore
+                };
+            } else if(value === 'stampUp' && (document.getElementsByClassName("stampUp")[0].className).indexOf("down") >-1) {
+                document.getElementsByClassName("stampUp")[0].className += " up";
+                document.getElementsByClassName("stampUp")[0].classList.remove("down");
+                return function(a,b) {
+                    return b.voteScore - a.voteScore
+                }
+            }
+        }
+    }
+}
