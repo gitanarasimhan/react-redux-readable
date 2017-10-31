@@ -111,5 +111,12 @@ li {
   bottom: 360px;
 }
 
+.borderBottom {
+  border-bottom: 1px solid black;
+}
+
+.errorMsg {
+  color: red;
+}
 
 
